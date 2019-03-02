@@ -18,10 +18,10 @@ class Feeder: Subsystem(), ReportableSubsystem {
 
     fun runFeeder() {
         when(Robot.joystick.povController) {
-            XboxMap.PovDirections.UP -> {
+            XboxMap.PovDirections.UP, XboxMap.PovDirections.UP_RIGHT, XboxMap.PovDirections.UP_LEFT -> {
                 feederMotor.set(-MAX_SPEED)
             }
-            XboxMap.PovDirections.DOWN -> {
+            XboxMap.PovDirections.DOWN, XboxMap.PovDirections.DOWN_RIGHT, XboxMap.PovDirections.DOWN_LEFT -> {
                 feederMotor.set(MAX_SPEED)
             }
             else -> {
