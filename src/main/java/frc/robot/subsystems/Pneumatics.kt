@@ -15,7 +15,7 @@ enum class PneumaticState(val kDirection: DoubleSolenoid.Value) {
     OFF(DoubleSolenoid.Value.kOff)
 }
 
-class Pneumatics: Subsystem(), ReportableSubsystem {
+class Pneumatics: ReportableSubsystem() {
 
    // private val compressor = Compressor(0)
     //private val pressureSensor = AnalogInput(0)

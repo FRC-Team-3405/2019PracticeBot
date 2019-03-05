@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.commands.runners.RunGyroscopeCommand
 import frc.robot.utilties.ReportableSubsystem
 
-class Gyroscope: Subsystem(), ReportableSubsystem {
+class Gyroscope: ReportableSubsystem() {
 
    //  private val gyroscope = AnalogGyro(1)
 
