@@ -72,7 +72,3 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
-
-wrapper {
-    gradleVersion = '5.0'
-}

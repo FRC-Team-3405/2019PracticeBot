@@ -14,8 +14,12 @@ import edu.wpi.first.wpilibj.command.Scheduler
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.commands.*
+import frc.robot.commands.buttons.*
+import frc.robot.maps.JoystickMap
+import frc.robot.maps.RobotMap
 import frc.robot.maps.XboxMap
 import frc.robot.subsystems.*
+import frc.robot.utilties.onPressed
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -35,85 +39,48 @@ class Robot : TimedRobot() {
      * used for any initialization code.
      */
     override fun robotInit() {
-        mchooser.setDefaultOption("Default Auto", kDefaultAuto)
-        mchooser.addOption("My Auto", kCustomAuto)
-        SmartDashboard.putData("Auto choices", mchooser)
+        Robot.gyroscope.initGryo()
+        Robot.gyroscope.calibrate()
 
-        GlobalScope.launch {
-            val usbCamera = CameraServer.getInstance().startAutomaticCapture()
-//            val axisCamera = CameraServer.getInstance().addAxisCamera("axis-camera.local")
+        //Register permanent button commands
+        joystick.RightBumperButton.onPressed(ShiftHighGearCommand())
+        joystick.LeftBumperButton.onPressed(ShiftLowGearCommand())
+        joystick.XButton.onPressed(GrabHatchPanelCommand())
+        joystick.YButton.onPressed(ReleaseHatchPanelCommand())
+        joystick.LeftLowerBumperButton.onPressed(SwitchDirectionCommand())
+        //Reserved for DriveTrain: joystick.RightLowerBumperButton
+        //Reserved for Feeder: joystick.povController
 
-            usbCamera.setResolution(640, 480)
-//            axisCamera.setResolution(640, 480)
-        }
+        joystick.ElevenButton.onPressed(FollowPathCommand("C-D"))
     }
 
     /**
-     * This function is called every robot packet, no matter the mode. Use
-     * this for items like diagnostics that you want ran during disabled,
-     * autonomous, teleoperated and test.
-     *
-     *
-     * This runs after the mode specific periodic functions, but before
-     * LiveWindow and SmartDashboard integrated updating.
+     * This function is called every robot packet, no matter the mode.
      */
     override fun robotPeriodic() {
         SmartDashboard.updateValues()
+        Scheduler.getInstance().run()
     }
 
     /**
-     * This autonomous (along with the chooser code above) shows how to select
-     * between different autonomous modes using the dashboard. The sendable
-     * chooser code works with the Java SmartDashboard. If you prefer the
-     * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-     * getString line to get the auto name from the text box below the Gyro
-     *
-     *
-     * You can add additional auto modes by adding additional comparisons to
-     * the switch structure below with additional strings. If using the
-     * SendableChooser make sure to add them to the chooser code above as well.
+     * This function is called at the beginning of the sandstorm period.
      */
     override fun autonomousInit() {
         autoSelected = mchooser.selected
-        // autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
         println("Auto selected: " + autoSelected!!)
-//        gyroscope.initGryo()
-//        gyroscope.reset()
     }
 
     /**
-     * This function is called periodically during autonomous.
+     * This function is called periodically during the sandstorm period.
      */
     override fun autonomousPeriodic() {
-        when (autoSelected) {
-            kCustomAuto -> {
-                println("Custom auto...")
-            }
-            kDefaultAuto -> {
-                println("Default auto...")
-            }
-            else -> {
-                println("? auto...")
-            }
-        }
+
     }
 
     /**
-     * This function is run when teleop is first started.
+     * This function is called at the end of the sandstorm period.
      */
     override fun teleopInit() {
-//        gyroscope.initGryo()
-//        gyroscope.reset()
-
-
-        println("Registering buttons!")
-        //Register button presses
-        joystick.AButton.whenPressed(SwitchDirectionCommand())
-        joystick.BButton.whenPressed(ReleaseThePlateCommand())
-        joystick.XButton.whenPressed(TogglePlatePuncherCommand())
-        joystick.YButton.whenPressed(TogglePlateGrabberCommand())
-        joystick.LeftBumperButton.whenPressed(ShiftDownCommand())
-        joystick.RightBumperButton.whenPressed(ShiftUpCommand())
 
     }
 
@@ -121,7 +88,7 @@ class Robot : TimedRobot() {
      * This function is called periodically during operator control.
      */
     override fun teleopPeriodic() {
-        Scheduler.getInstance().run()
+
     }
 
     /**
@@ -152,22 +119,37 @@ class Robot : TimedRobot() {
 
     }
 
+    /**
+     * Static members of the robot (Subsystems)
+     */
     companion object {
-        private const val kDefaultAuto = "Default"
-        private const val kCustomAuto = "My Auto"
-
-        val joystick = XboxMap.Controller(Joystick(0))
+        //Control Joysticks
+        val joystick = XboxMap.Controller(Joystick(RobotMap.MAIN_JOYSTICK_PORT))
+        val secondaryJoystick = JoystickMap.Controller(Joystick(RobotMap.SECONDARY_JOYSTICK_PORT))
 
         //Drive subsystems
         val driveTrain = DriveTrain()
-        val pneumatics = Pneumatics()
-        val feeder = Feeder()
 
         //Sensor subsystems
         val builtInAccelerometer = Accelerometer()
         val gyroscope = Gyroscope()
 
-        //Camera Subsystems
-        //TODO
+        //Pneumatics subsystems
+        val pneumatics  = Pneumatics()
+
+        //Elevator subsystems
+        val elevator = Elevator()
+
+        //Box subsystems
+//        val box = Box()
+
+        //Feeder subsystems
+        val feeder = Feeder()
+
+        //Autonomous Control Subsystem
+//        val autonomousControl = AutonomousControl()
+
+        //Power
+//        val pdp = PowerDistributionPanel(0)
     }
 }

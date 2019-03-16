@@ -1,28 +1,26 @@
 package frc.robot.subsystems
 
-import com.ctre.phoenix.motorcontrol.ControlMode
-import com.ctre.phoenix.motorcontrol.DemandType
-import com.ctre.phoenix.motorcontrol.FollowerType
-import com.ctre.phoenix.motorcontrol.NeutralMode
+import com.ctre.phoenix.motorcontrol.*
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
-import edu.wpi.first.wpilibj.command.Subsystem
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.Robot
-import frc.robot.commands.runners.RunDriveTrainCommand
+import frc.robot.commands.RunDriveTrainCommand
 import frc.robot.maps.*
-import frc.robot.maps.RobotMap.TALON_SRX_BL
-import frc.robot.maps.RobotMap.TALON_SRX_BR
-import frc.robot.maps.RobotMap.TALON_SRX_FL
-import frc.robot.maps.RobotMap.TALON_SRX_FR
+import frc.robot.maps.RobotMap.BL_TALONSRX
+import frc.robot.maps.RobotMap.BR_TALONSRX
+import frc.robot.maps.RobotMap.FL_TALONSRX
+import frc.robot.maps.RobotMap.FR_TALONSRX
 import frc.robot.utilties.ReportableSubsystem
+import frc.robot.utilties.configGains
+import frc.robot.utilties.onPressed
 import kotlin.math.PI
 
 class DriveTrain: ReportableSubsystem() {
 
-    private val frontRight = TalonSRX(TALON_SRX_FR)
-    private val frontLeft = TalonSRX(TALON_SRX_FL)
-    private val backRight = TalonSRX(TALON_SRX_BR)
-    private val backLeft = TalonSRX(TALON_SRX_BL)
+    private val frontRight = TalonSRX(FR_TALONSRX)
+    private val frontLeft = TalonSRX(FL_TALONSRX)
+    private val backRight = TalonSRX(BR_TALONSRX)
+    private val backLeft = TalonSRX(BL_TALONSRX)
 
     private var direction = Direction.HATCH_FORWARD
 
@@ -53,10 +51,10 @@ class DriveTrain: ReportableSubsystem() {
         backLeft.apply {
             set(ControlMode.PercentOutput, 0.0)
             setNeutralMode(NeutralMode.Brake)
-//            configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_PRIMARY, TIMEOUT_MS)
+            configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_PRIMARY, TIMEOUT_MS)
             inverted = INVERT_LEFT
-//            setSensorPhase(true)
-//            setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, TIMEOUT_MS)
+            setSensorPhase(true)
+            setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, TIMEOUT_MS)
             configNeutralDeadband(NEUTRAL_DEADBAND, TIMEOUT_MS)
             configPeakOutputForward(+1.0, TIMEOUT_MS)
             configPeakOutputReverse(-1.0, TIMEOUT_MS)
@@ -66,10 +64,10 @@ class DriveTrain: ReportableSubsystem() {
         backRight.apply {
             set(ControlMode.PercentOutput, 0.0)
             setNeutralMode(NeutralMode.Brake)
-//            configRemoteFeedbackFilter(backLeft.deviceID, RemoteSensorSource.TalonSRX_SelectedSensor, REMOTE_0, TIMEOUT_MS)
-//            configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor0, TIMEOUT_MS)
-//            configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, TIMEOUT_MS)
-//            configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, PID_TURN, TIMEOUT_MS)
+            configRemoteFeedbackFilter(backLeft.deviceID, RemoteSensorSource.TalonSRX_SelectedSensor, REMOTE_0, TIMEOUT_MS)
+            configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor0, TIMEOUT_MS)
+            configSensorTerm(SensorTerm.Diff0, FeedbackDevice.QuadEncoder, TIMEOUT_MS)
+            configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, PID_TURN, TIMEOUT_MS)
 
             //Scales the error by a coefficient calculated here:
             /**
@@ -81,23 +79,23 @@ class DriveTrain: ReportableSubsystem() {
              */
 //            configSelectedFeedbackCoefficient(TURN_TRAVEL_UNITS_PER_ROTATION / ENCODER_UNITS_PER_ROTATION, PID_TURN, TIMEOUT_MS)
             inverted = INVERT_RIGHT
-//            setSensorPhase(true)
-//            setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, TIMEOUT_MS)
-//            setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, TIMEOUT_MS)
+            setSensorPhase(true)
+            setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, TIMEOUT_MS)
+            setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, TIMEOUT_MS)
             configNeutralDeadband(NEUTRAL_DEADBAND, TIMEOUT_MS)
             configPeakOutputForward(+1.0, TIMEOUT_MS)
             configPeakOutputReverse(-1.0)
-//            configGains(SLOT_TURNING, GAINS_TURNING, TIMEOUT_MS)
-//            configClosedLoopPeriod(0, CLOSED_LOOP_TIME_MS, TIMEOUT_MS)
-//            configClosedLoopPeriod(1, CLOSED_LOOP_TIME_MS, TIMEOUT_MS)
-//            configAuxPIDPolarity(AUX_PID_POLARITY, TIMEOUT_MS)
+            configGains(SLOT_TURNING, GAINS_TURNING, TIMEOUT_MS)
+            configClosedLoopPeriod(0, CLOSED_LOOP_TIME_MS, TIMEOUT_MS)
+            configClosedLoopPeriod(1, CLOSED_LOOP_TIME_MS, TIMEOUT_MS)
+            configAuxPIDPolarity(AUX_PID_POLARITY, TIMEOUT_MS)
         }
 
-//        Robot.joystick.RightLowerBumperButton.onPressed {
-//            backRight.selectProfileSlot(SLOT_TURNING, PID_TURN)
-//
-//            currentHeading = backRight.getSelectedSensorPosition(1).toDouble()
-//        }
+        Robot.joystick.RightLowerBumperButton.onPressed {
+            backRight.selectProfileSlot(SLOT_TURNING, PID_TURN)
+
+            currentHeading = backRight.getSelectedSensorPosition(1).toDouble()
+        }
     }
 
     fun drive() {
@@ -107,8 +105,12 @@ class DriveTrain: ReportableSubsystem() {
             driveStraight(Robot.joystick.leftY * MAX_MOTOR_SPEED)
         } else {
             //Teleoperator control
-            val leftY = Robot.joystick.leftY * MAX_MOTOR_SPEED
-            val rightY = Robot.joystick.rightY * MAX_MOTOR_SPEED
+            var leftY = Robot.joystick.leftY * MAX_MOTOR_SPEED
+            var rightY = Robot.joystick.rightY * MAX_MOTOR_SPEED
+            if(Robot.pneumatics.isHighGear()) {
+                leftY *= 0.85
+                rightY *= 0.85
+            }
 
             if(direction == Direction.HATCH_FORWARD) {
                 driveSide(powerLeft = leftY, powerRight = rightY)
@@ -119,7 +121,14 @@ class DriveTrain: ReportableSubsystem() {
         }
     }
 
-    private fun driveSide(powerLeft: Double, powerRight: Double) {
+    fun switchDirection() {
+        direction = when(direction) {
+            Direction.HATCH_FORWARD -> Direction.BOX_FORWARD
+            Direction.BOX_FORWARD -> Direction.HATCH_FORWARD
+        }
+    }
+
+    fun driveSide(powerLeft: Double, powerRight: Double) {
         backLeft.set(ControlMode.PercentOutput, powerLeft * direction.sign)
         backRight.set(ControlMode.PercentOutput, powerRight * direction.sign)
         frontLeft.follow(backLeft)
@@ -156,13 +165,17 @@ class DriveTrain: ReportableSubsystem() {
         return (encoderUnits / ENCODER_UNITS_PER_REVOLUTION) * WHEEL_DIAMETER * PI
     }
 
-    private fun resetEncoderCounts() {
-        backLeft.sensorCollection.setQuadraturePosition(0, TIMEOUT_MS)
-        backRight.sensorCollection.setQuadraturePosition(0, TIMEOUT_MS)
+    fun getLeftEncoder(): Int {
+        return backLeft.selectedSensorPosition
     }
 
-    fun switchDirection() {
-        //TODO
+    fun getRightEncoder(): Int {
+        return backRight.selectedSensorPosition
+    }
+
+    fun resetEncoderCounts() {
+        backLeft.sensorCollection.setQuadraturePosition(0, TIMEOUT_MS)
+        backRight.sensorCollection.setQuadraturePosition(0, TIMEOUT_MS)
     }
 
     override fun report() {

@@ -2,7 +2,6 @@ package frc.robot.utilties
 
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import frc.robot.subsystems.PneumaticState
 
 class TwoStatePneumatic(private val doubleSolenoid: DoubleSolenoid, val name: String) {
     val solenoidState get() = doubleSolenoid.get()
@@ -68,4 +67,10 @@ class TwoStatePneumatic(private val doubleSolenoid: DoubleSolenoid, val name: St
         SmartDashboard.putBoolean("rev_solenoid_fault_$name", doubleSolenoid.isRevSolenoidBlackListed)
     }
 
+}
+
+enum class PneumaticState(val kDirection: DoubleSolenoid.Value) {
+    FORWARD(DoubleSolenoid.Value.kForward),
+    BACKWARD(DoubleSolenoid.Value.kReverse),
+    OFF(DoubleSolenoid.Value.kOff)
 }

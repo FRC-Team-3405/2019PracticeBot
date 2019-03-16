@@ -1,53 +1,60 @@
 package frc.robot.subsystems
 
-import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.Compressor
 import edu.wpi.first.wpilibj.DoubleSolenoid
-import edu.wpi.first.wpilibj.command.Subsystem
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import frc.robot.commands.runners.RunPneumaticsCommand
 import frc.robot.utilties.ReportableSubsystem
 import frc.robot.utilties.TwoStatePneumatic
 
-enum class PneumaticState(val kDirection: DoubleSolenoid.Value) {
-    FORWARD(DoubleSolenoid.Value.kForward),
-    BACKWARD(DoubleSolenoid.Value.kReverse),
-    OFF(DoubleSolenoid.Value.kOff)
-}
-
 class Pneumatics: ReportableSubsystem() {
-
-   // private val compressor = Compressor(0)
-    //private val pressureSensor = AnalogInput(0)
-
-    //val shifter = TwoStatePneumatic(DoubleSolenoid(5, 4), "shifter")
-    //val plateGrabber = TwoStatePneumatic(DoubleSolenoid(3, 2), "plategrabber")
-    //val platePuncher = TwoStatePneumatic(DoubleSolenoid(1, 0), "platepuncher")
-
     override fun initDefaultCommand() {
-//        compressor.enabled()
-        defaultCommand = RunPneumaticsCommand()
+        println("Pneumatics initialized")
     }
 
-/* 
-    //TODO test these functions
-    fun shiftUp() {
-        shifter.setState(PneumaticState.FORWARD)
+//    private val compressor = Compressor(COMPRESSOR_PORT)
+//    private val shifter = TwoStatePneumatic(DoubleSolenoid(SHIFTER_OUT, SHIFTER_IN))
+//    private val puncher = TwoStatePneumatic(DoubleSolenoid(PUNCHER_OUT, PUNCHER_IN), "puncher")
+//    private val grabber = TwoStatePneumatic(DoubleSolenoid(GRABBER_OUT, GRABBER_IN), "grabber")
+
+    fun shiftHighGear() {
+        println("Shifted to high gear")
+        report()
     }
 
-    fun shiftDown() {
-        shifter.setState(PneumaticState.BACKWARD)
+    fun shiftLowGear() {
+        println("Shifted to low gear")
+        report()
     }
-*/
+
+    fun isHighGear() = false
+
+    fun toggleShift() {
+        println("Toggling shifter")
+        report()
+    }
+
+    fun punch() {
+        println("Punch!")
+        report()
+    }
+
+    fun unPunch() {
+        println("UnPunch!")
+        report()
+    }
+
+    fun grab() {
+        println("Grabbing!")
+        report()
+    }
+
+    fun retract() {
+        println("Retracting")
+        report()
+    }
+
     override fun report() {
-//        SmartDashboard.putString("plategrabber_direction", plateGrabber.solenoidState.toString())
-//        SmartDashboard.putString("platepuncher_direction", platePuncher.solenoidState.toString())
-//        SmartDashboard.putString("shifter_direction", shifter.solenoidState.toString())
-//        SmartDashboard.putBoolean("compressor_pressureswitchvalue", compressor.pressureSwitchValue)
-//
-//        SmartDashboard.putNumber("Analog Pressure Sensor Voltage", pressureSensor.voltage)
-//        SmartDashboard.putNumber("~Pressure (PSI)", analogToUnitPSI(pressureSensor.voltage))
-
+        SmartDashboard.putBoolean("Physical Pneumatics Enabled", false)
     }
 
     companion object {
