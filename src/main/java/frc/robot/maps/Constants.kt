@@ -6,9 +6,9 @@ package frc.robot.maps
 const val MAX_MOTOR_SPEED = 0.85
 
 /**
- * Maximum Robot velocity when following paths (ft/s)
+ * Maximum Robot velocity when following paths (m/s)
  */
-const val MAX_ROBOT_VELOCITY = 10.0
+const val MAX_ROBOT_VELOCITY = 1.5
 
 /**
  * Maximum speed of the elevator motor

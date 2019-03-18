@@ -53,7 +53,7 @@ class DriveTrain: ReportableSubsystem() {
             setNeutralMode(NeutralMode.Brake)
             configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_PRIMARY, TIMEOUT_MS)
             inverted = INVERT_LEFT
-            setSensorPhase(true)
+            setSensorPhase(false)
             setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, TIMEOUT_MS)
             configNeutralDeadband(NEUTRAL_DEADBAND, TIMEOUT_MS)
             configPeakOutputForward(+1.0, TIMEOUT_MS)
@@ -79,7 +79,7 @@ class DriveTrain: ReportableSubsystem() {
              */
 //            configSelectedFeedbackCoefficient(TURN_TRAVEL_UNITS_PER_ROTATION / ENCODER_UNITS_PER_ROTATION, PID_TURN, TIMEOUT_MS)
             inverted = INVERT_RIGHT
-            setSensorPhase(true)
+            setSensorPhase(false)
             setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, TIMEOUT_MS)
             setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, TIMEOUT_MS)
             configNeutralDeadband(NEUTRAL_DEADBAND, TIMEOUT_MS)

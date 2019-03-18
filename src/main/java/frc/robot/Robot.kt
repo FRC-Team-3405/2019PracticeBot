@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 class Robot : TimedRobot() {
     private var autoSelected: String? = null
     private val mchooser = SendableChooser<String>()
+    private var currentPathCommand: FollowPathCommand? = null
 
     /**
      * This function is run when the robot is first started up and should be
@@ -51,7 +52,25 @@ class Robot : TimedRobot() {
         //Reserved for DriveTrain: joystick.RightLowerBumperButton
         //Reserved for Feeder: joystick.povController
 
-        joystick.ElevenButton.onPressed(FollowPathCommand("C-D"))
+        joystick.ElevenButton.onPressed {
+            val path = SmartDashboard.getString("path", "")
+            if(path.isNotEmpty()) {
+                currentPathCommand = FollowPathCommand(path)
+                currentPathCommand?.start()
+                println("Started following path $path")
+                SmartDashboard.putString("current_path", path)
+            }
+        }
+
+        joystick.TenButton.onPressed {
+            currentPathCommand?.let {
+                if(it.isRunning) {
+                    it.cancel()
+                    println("Cancelled path following")
+                    SmartDashboard.putString("current_path", null)
+                }
+            }
+        }
     }
 
     /**
@@ -141,7 +160,7 @@ class Robot : TimedRobot() {
         val elevator = Elevator()
 
         //Box subsystems
-//        val box = Box()
+        val box = Box()
 
         //Feeder subsystems
         val feeder = Feeder()

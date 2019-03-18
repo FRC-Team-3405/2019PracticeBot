@@ -15,7 +15,7 @@ class Elevator: ReportableSubsystem() {
 //    private val elevatorMotor = TalonSRX(ELEVATOR_MOTOR_PORT)
 
     fun driveElevator() {
-        println("Driving elevator at speed: ${Robot.secondaryJoystick.y * MAX_ELEVATOR_SPEED}")
+//        println("Driving elevator at speed: ${Robot.secondaryJoystick.y * MAX_ELEVATOR_SPEED}")
     }
 
     fun setElevatorHeight(inches: Double) {
