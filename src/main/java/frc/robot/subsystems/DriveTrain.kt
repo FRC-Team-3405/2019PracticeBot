@@ -22,6 +22,8 @@ class DriveTrain: ReportableSubsystem() {
     private val backRight = TalonSRX(BR_TALONSRX)
     private val backLeft = TalonSRX(BL_TALONSRX)
 
+    private var currentmaxspeed = MAX_MOTOR_SPEED
+
     private var direction = Direction.HATCH_FORWARD
 
     /// Set to true if the robot is under autonomous control (i.e. user input is ignored)
@@ -34,6 +36,8 @@ class DriveTrain: ReportableSubsystem() {
     override fun initDefaultCommand() {
         defaultCommand = RunDriveTrainCommand()
         resetEncoderCounts()
+
+        SmartDashboard.putNumber("CurrentMaxSpeed", currentmaxspeed)
 
         //Configure Front Right TalonSRX to follow Back Right
         frontRight.apply {
@@ -99,14 +103,16 @@ class DriveTrain: ReportableSubsystem() {
     }
 
     fun drive() {
+        currentmaxspeed = SmartDashboard.getNumber("CurrentMaxSpeed")
+
         if(isUnderAutonomousControl) {
 
         } else if(Robot.joystick.RightLowerBumperButton.get()) {
-            driveStraight(Robot.joystick.leftY * MAX_MOTOR_SPEED)
+            driveStraight(Robot.joystick.leftY * currentmaxspeed)
         } else {
             //Teleoperator control
-            var leftY = Robot.joystick.leftY * MAX_MOTOR_SPEED * .85
-            var rightY = Robot.joystick.rightY * MAX_MOTOR_SPEED * .85
+            var leftY = Robot.joystick.leftY * currentmaxspeed * .85
+            var rightY = Robot.joystick.rightY * currentmaxspeed * .85
             if(Robot.pneumatics.isHighGear()) {
                 leftY *= 0.85
                 rightY *= 0.85
@@ -184,7 +190,7 @@ class DriveTrain: ReportableSubsystem() {
         SmartDashboard.putNumber("heading", currentHeading)
 
         //Software-set max speed TODO add a slider on Shuffleboard to configure
-        SmartDashboard.putNumber("max_speed", MAX_MOTOR_SPEED)
+        //SmartDashboard.putNumber("max_speed", MAX_MOTOR_SPEED)
 
         //Encoder stuff
         SmartDashboard.putNumber("right_encoder_count", backRight.selectedSensorPosition.toDouble())
