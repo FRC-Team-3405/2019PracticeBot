@@ -105,8 +105,8 @@ class DriveTrain: ReportableSubsystem() {
             driveStraight(Robot.joystick.leftY * MAX_MOTOR_SPEED)
         } else {
             //Teleoperator control
-            var leftY = Robot.joystick.leftY * MAX_MOTOR_SPEED
-            var rightY = Robot.joystick.rightY * MAX_MOTOR_SPEED
+            var leftY = Robot.joystick.leftY * MAX_MOTOR_SPEED * .85
+            var rightY = Robot.joystick.rightY * MAX_MOTOR_SPEED * .85
             if(Robot.pneumatics.isHighGear()) {
                 leftY *= 0.85
                 rightY *= 0.85
