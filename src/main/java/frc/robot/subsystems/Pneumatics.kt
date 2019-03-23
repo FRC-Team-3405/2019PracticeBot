@@ -54,6 +54,7 @@ class Pneumatics: ReportableSubsystem() {
     }
 
     override fun report() {
+        SmartDashboard.putBoolean("High Gear", isHighGear())
         SmartDashboard.putBoolean("Physical Pneumatics Enabled", false)
     }
 
