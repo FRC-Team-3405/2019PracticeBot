@@ -27,7 +27,7 @@ class DriveTrain: ReportableSubsystem() {
     private var direction = Direction.HATCH_FORWARD
 
     /// Set to true if the robot is under autonomous control (i.e. user input is ignored)
-    private var isUnderAutonomousControl = false
+    private var rotating = false
 
     private var currentHeading = 0.0
     private var targetAngle = 0.0
@@ -105,7 +105,7 @@ class DriveTrain: ReportableSubsystem() {
     fun drive() {
         currentmaxspeed = SmartDashboard.getNumber("CurrentMaxSpeed")
 
-        if(isUnderAutonomousControl) {
+        if(rotating) {
 
         } else if(Robot.joystick.RightLowerBumperButton.get()) {
             driveStraight(Robot.joystick.leftY * currentmaxspeed)
@@ -154,13 +154,7 @@ class DriveTrain: ReportableSubsystem() {
     fun auto_turnAngle(degrees: Double) {
         resetEncoderCounts()
         targetAngle = degrees
-        isUnderAutonomousControl = true
-    }
-
-    fun auto_driveDistance(inches: Double) {
-        resetEncoderCounts()
-        targetDistance = inches
-        isUnderAutonomousControl = true
+        rotating = true
     }
 
     private fun calcRotation(encoderDiff: Double): Double {

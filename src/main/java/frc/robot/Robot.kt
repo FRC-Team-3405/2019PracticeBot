@@ -28,8 +28,6 @@ import frc.robot.utilties.onPressed
  * project.
  */
 class Robot : TimedRobot() {
-    private var autoSelected: String? = null
-    private val mchooser = SendableChooser<String>()
     private var currentPathCommand: FollowPathCommand? = null
 
     /**
@@ -45,9 +43,8 @@ class Robot : TimedRobot() {
         joystick.LeftBumperButton.onPressed(ShiftLowGearCommand())
         joystick.NineButton.onPressed(GrabHatchPanelCommand())
         joystick.TenButton.onPressed(ReleaseHatchPanelCommand())
-        joystick.LeftLowerBumperButton.onPressed(SwitchDirectionCommand())
-        //Reserved for DriveTrain: joystick.RightLowerBumperButton
-        //Reserved for Feeder: joystick.povController
+        joystick.AButton.onPressed(SwitchDirectionCommand())
+        joystick.BButton.onPressed { Robot.feeder.toggleFeeder() } //TODO make command
 
         joystick.XButton.onPressed {
             val path = SmartDashboard.getString("path", "")
@@ -76,8 +73,7 @@ class Robot : TimedRobot() {
      * This function is called at the beginning of the sandstorm period.
      */
     override fun autonomousInit() {
-        autoSelected = mchooser.selected
-        println("Auto selected: " + autoSelected!!)
+
     }
 
     /**
