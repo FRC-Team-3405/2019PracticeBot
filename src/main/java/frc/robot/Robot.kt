@@ -7,21 +7,18 @@
 
 package frc.robot
 
-import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.Joystick
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.command.Scheduler
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import frc.robot.commands.*
+import frc.robot.commands.FollowPathCommand
 import frc.robot.commands.buttons.*
 import frc.robot.maps.JoystickMap
 import frc.robot.maps.RobotMap
 import frc.robot.maps.XboxMap
 import frc.robot.subsystems.*
 import frc.robot.utilties.onPressed
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -46,29 +43,23 @@ class Robot : TimedRobot() {
         //Register permanent button commands
         joystick.RightBumperButton.onPressed(ShiftHighGearCommand())
         joystick.LeftBumperButton.onPressed(ShiftLowGearCommand())
-        joystick.XButton.onPressed(GrabHatchPanelCommand())
-        joystick.YButton.onPressed(ReleaseHatchPanelCommand())
+        joystick.NineButton.onPressed(GrabHatchPanelCommand())
+        joystick.TenButton.onPressed(ReleaseHatchPanelCommand())
         joystick.LeftLowerBumperButton.onPressed(SwitchDirectionCommand())
         //Reserved for DriveTrain: joystick.RightLowerBumperButton
         //Reserved for Feeder: joystick.povController
 
-        joystick.ElevenButton.onPressed {
+        joystick.XButton.onPressed {
             val path = SmartDashboard.getString("path", "")
-            if(path.isNotEmpty()) {
+            if (path.isNotEmpty() && currentPathCommand?.isRunning != true) {
                 currentPathCommand = FollowPathCommand(path)
                 currentPathCommand?.start()
                 println("Started following path $path")
                 SmartDashboard.putString("current_path", path)
-            }
-        }
-
-        joystick.TenButton.onPressed {
-            currentPathCommand?.let {
-                if(it.isRunning) {
-                    it.cancel()
-                    println("Cancelled path following")
-                    SmartDashboard.putString("current_path", null)
-                }
+            } else if (currentPathCommand?.isRunning == true) {
+                currentPathCommand?.cancel()
+                println("Cancelled path $path")
+                SmartDashboard.putString("current_path", null)
             }
         }
     }
@@ -154,7 +145,7 @@ class Robot : TimedRobot() {
         val gyroscope = Gyroscope()
 
         //Pneumatics subsystems
-        val pneumatics  = Pneumatics()
+        val pneumatics = Pneumatics()
 
         //Elevator subsystems
         val elevator = Elevator()
