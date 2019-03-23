@@ -34,10 +34,10 @@ object RobotMap {
 
     //Box
     const val BOX_MOTOR_PORT = 5 //Victor SPX
-    const val BOX_BELT_MOTOR_PORT = 4 //Spark
+//    const val BOX_BELT_MOTOR_PORT = 4 //Spark
 
     //Feeder
-//    const val FEEDER_MOTOR_PORT = 0 //Spark
+    const val FEEDER_MOTOR_PORT = 4 //Spark
 //    const val FEEDER_MOTOR_2_PORT = 1 //Spark
 
 }

@@ -103,7 +103,7 @@ class DriveTrain: ReportableSubsystem() {
     }
 
     fun drive() {
-        currentmaxspeed = SmartDashboard.getNumber("CurrentMaxSpeed")
+        currentmaxspeed = SmartDashboard.getNumber("CurrentMaxSpeed", MAX_MOTOR_SPEED)
 
         if(rotating) {
 
@@ -183,8 +183,8 @@ class DriveTrain: ReportableSubsystem() {
         SmartDashboard.putNumber("direction", direction.sign.toDouble())
         SmartDashboard.putNumber("heading", currentHeading)
 
-        //Software-set max speed TODO add a slider on Shuffleboard to configure
-        //SmartDashboard.putNumber("max_speed", MAX_MOTOR_SPEED)
+        //Software-set max speed
+        SmartDashboard.putNumber("CurrentMaxSpeed", currentmaxspeed)
 
         //Encoder stuff
         SmartDashboard.putNumber("right_encoder_count", backRight.selectedSensorPosition.toDouble())

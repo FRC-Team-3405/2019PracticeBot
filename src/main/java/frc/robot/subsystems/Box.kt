@@ -2,12 +2,9 @@ package frc.robot.subsystems
 
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.VictorSPX
-import edu.wpi.first.wpilibj.DigitalInput
-import edu.wpi.first.wpilibj.Spark
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.Robot
 import frc.robot.commands.RunBoxCommand
-import frc.robot.maps.RobotMap.BOX_BELT_MOTOR_PORT
 import frc.robot.maps.RobotMap.BOX_MOTOR_PORT
 import frc.robot.utilties.ReportableSubsystem
 
@@ -17,7 +14,7 @@ class Box: ReportableSubsystem() {
     }
 
     private val boxRotatorMotor = VictorSPX(BOX_MOTOR_PORT)
-    private val beltMotor = Spark(BOX_BELT_MOTOR_PORT)
+//    private val beltMotor = Spark(BOX_BELT_MOTOR_PORT)
 
     fun rotateBox() {
         if(Robot.secondaryJoystick.eightButton.get()) {

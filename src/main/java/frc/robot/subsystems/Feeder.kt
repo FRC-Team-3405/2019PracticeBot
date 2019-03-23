@@ -1,8 +1,11 @@
 package frc.robot.subsystems
 
+import edu.wpi.first.wpilibj.Spark
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.Robot
 import frc.robot.commands.RunFeederCommand
+import frc.robot.maps.MAX_MOTOR_SPEED
+import frc.robot.maps.RobotMap.FEEDER_MOTOR_PORT
 import frc.robot.maps.XboxMap
 import frc.robot.utilties.ReportableSubsystem
 
@@ -11,17 +14,17 @@ class Feeder: ReportableSubsystem() {
         defaultCommand = RunFeederCommand()
     }
 
-//    private val feederMotor = Spark(FEEDER_MOTOR_PORT)
+    private val feederMotor = Spark(FEEDER_MOTOR_PORT)
 //    private val secondaryFeederMotor = Spark(FEEDER_MOTOR_2_PORT)
     private var feederEnabled = false
 
     fun runFeeder() {
         if(feederEnabled) {
-            //feederMotor.set(-MAX_MOTOR_SPEED * 0.4)
-            //secondaryFeederMotor.set(-MAX_MOTOR_SPEED * 0.4)
+            feederMotor.set(MAX_MOTOR_SPEED * 0.4)
+//            secondaryFeederMotor.set(-MAX_MOTOR_SPEED * 0.4)
         } else {
-            //feederMotor.set(0.0)
-            //secondaryFeederMotor.set(0.0)
+            feederMotor.set(0.0)
+//            secondaryFeederMotor.set(0.0)
         }
     }
 
