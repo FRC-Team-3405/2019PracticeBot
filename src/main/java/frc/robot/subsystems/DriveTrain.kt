@@ -15,29 +15,29 @@ import frc.robot.utilties.configGains
 import frc.robot.utilties.onPressed
 import kotlin.math.PI
 
-class DriveTrain: ReportableSubsystem() {
+class DriveTrain : ReportableSubsystem() {
 
     private val frontRight = TalonSRX(FR_TALONSRX)
     private val frontLeft = TalonSRX(FL_TALONSRX)
     private val backRight = TalonSRX(BR_TALONSRX)
     private val backLeft = TalonSRX(BL_TALONSRX)
 
-    private var currentmaxspeed = MAX_MOTOR_SPEED
+    private var currentMaxSpeed = MAX_MOTOR_SPEED
 
     private var direction = Direction.HATCH_FORWARD
 
-    /// Set to true if the robot is under autonomous control (i.e. user input is ignored)
-    private var rotating = false
 
-    private var currentHeading = 0.0
-    private var targetAngle = 0.0
-    private var targetDistance = 0.0
+    private var rotating = false // Used for turning to an angle
+    private var currentHeading = 0.0 // Used for driving straight
+    private var targetAngle = 0.0 // Used for turning to an angle
+
+    private var povPressed = false
 
     override fun initDefaultCommand() {
         defaultCommand = RunDriveTrainCommand()
         resetEncoderCounts()
 
-        SmartDashboard.putNumber("CurrentMaxSpeed", currentmaxspeed)
+        SmartDashboard.putNumber("CurrentMaxSpeed", currentMaxSpeed)
 
         //Configure Front Right TalonSRX to follow Back Right
         frontRight.apply {
@@ -81,7 +81,7 @@ class DriveTrain: ReportableSubsystem() {
              *  ... so at 3600 units per 360', that ensures 0.1 degree precision in firmware closed-loop
              *  and motion profile trajectory points can range +-2 rotations.
              */
-//            configSelectedFeedbackCoefficient(TURN_TRAVEL_UNITS_PER_ROTATION / ENCODER_UNITS_PER_ROTATION, PID_TURN, TIMEOUT_MS)
+            configSelectedFeedbackCoefficient(TURN_TRAVEL_UNITS_PER_ROTATION / ENCODER_UNITS_PER_ROTATION, PID_TURN, TIMEOUT_MS)
             inverted = INVERT_RIGHT
             setSensorPhase(false)
             setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, TIMEOUT_MS)
@@ -95,30 +95,78 @@ class DriveTrain: ReportableSubsystem() {
             configAuxPIDPolarity(AUX_PID_POLARITY, TIMEOUT_MS)
         }
 
-        Robot.joystick.RightLowerBumperButton.onPressed {
-            backRight.selectProfileSlot(SLOT_TURNING, PID_TURN)
-
-            currentHeading = backRight.getSelectedSensorPosition(1).toDouble()
+        Robot.joystick.LeftLowerBumperButton.onPressed {
+            setHeadingForDriveStraight()
         }
     }
 
     fun drive() {
-        currentmaxspeed = SmartDashboard.getNumber("CurrentMaxSpeed", MAX_MOTOR_SPEED)
+        currentMaxSpeed = SmartDashboard.getNumber("CurrentMaxSpeed", MAX_MOTOR_SPEED)
 
-        if(rotating) {
+        if (rotating) {
+            //TODO check this rotation code
+            when {
+                targetAngle > Robot.gyroscope.getAngle() - Robot.gyroscope.getRate() -> {
+                    //Rotate right at full speed
+                    driveSide(currentMaxSpeed, -currentMaxSpeed)
+                }
+                targetAngle < Robot.gyroscope.getAngle() + Robot.gyroscope.getRate() -> {
+                    //Rotate left at full speed
+                    driveSide(-currentMaxSpeed, currentMaxSpeed)
+                }
+                else -> {
+                    rotating = false
+                    println("Rotated to ${Robot.gyroscope.getAngle()}")
+                }
+            }
+        } else if (Robot.joystick.povController != XboxMap.PovDirections.NULL) {
+            //The POV pad on the joystick controls specialized driving maneuvers.
 
-        } else if(Robot.joystick.RightLowerBumperButton.get()) {
-            driveStraight(Robot.joystick.leftY * currentmaxspeed)
+            when (Robot.joystick.povController) {
+                XboxMap.PovDirections.UP, XboxMap.PovDirections.UP_RIGHT, XboxMap.PovDirections.UP_LEFT -> {
+                    if (!povPressed) {
+                        setHeadingForDriveStraight()
+                    }
+
+                    driveStraight(currentMaxSpeed * 0.85) //TODO tune
+                }
+                XboxMap.PovDirections.DOWN, XboxMap.PovDirections.DOWN_RIGHT, XboxMap.PovDirections.DOWN_LEFT -> {
+                    if (!povPressed) {
+                        setHeadingForDriveStraight()
+                    }
+
+                    driveStraight(-currentMaxSpeed * 0.85) //TODO tune
+                }
+                XboxMap.PovDirections.RIGHT -> {
+                    if (!povPressed) {
+                        autoTurnAngle(Robot.gyroscope.getAngle() + 180)
+                    }
+                }
+                XboxMap.PovDirections.LEFT -> {
+                    if (!povPressed) {
+                        autoTurnAngle(Robot.gyroscope.getAngle() - 180)
+                    }
+                }
+                XboxMap.PovDirections.NULL -> {}
+            }
+            povPressed = true
+        } else if (Robot.joystick.LeftLowerBumperButton.get()) {
+            //This will make the robot drive straight until it hits the tape on the ground
+            if(!(Robot.leftLightSensor.get() || Robot.rightLightSensor.get())) {
+                driveStraight(Robot.joystick.leftY * currentMaxSpeed)
+            }
         } else {
-            //Teleoperator control
-            var leftY = Robot.joystick.leftY * currentmaxspeed * .85
-            var rightY = Robot.joystick.rightY * currentmaxspeed * .85
-            if(Robot.pneumatics.isHighGear()) {
+            povPressed = false
+
+            var leftY = Robot.joystick.leftY * currentMaxSpeed * .85
+            var rightY = Robot.joystick.rightY * currentMaxSpeed * .85
+            if (Robot.pneumatics.isHighGear()) {
                 leftY *= 0.85
                 rightY *= 0.85
             }
 
-            if(direction == Direction.HATCH_FORWARD) {
+            //Reverse wheel base when direction is reversed.
+            if (direction == Direction.HATCH_FORWARD) {
                 driveSide(powerLeft = leftY, powerRight = rightY)
             } else {
                 //Intentional swap
@@ -128,7 +176,7 @@ class DriveTrain: ReportableSubsystem() {
     }
 
     fun switchDirection() {
-        direction = when(direction) {
+        direction = when (direction) {
             Direction.HATCH_FORWARD -> Direction.BOX_FORWARD
             Direction.BOX_FORWARD -> Direction.HATCH_FORWARD
         }
@@ -147,12 +195,11 @@ class DriveTrain: ReportableSubsystem() {
     }
 
     private fun driveStraight(power: Double) {
-        backRight.set(ControlMode.PercentOutput, power, DemandType.AuxPID, currentHeading)
+        backRight.set(ControlMode.PercentOutput, power * direction.sign, DemandType.AuxPID, currentHeading)
         backLeft.follow(backRight, FollowerType.AuxOutput1)
     }
 
-    fun auto_turnAngle(degrees: Double) {
-        resetEncoderCounts()
+    private fun autoTurnAngle(degrees: Double) {
         targetAngle = degrees
         rotating = true
     }
@@ -184,7 +231,7 @@ class DriveTrain: ReportableSubsystem() {
         SmartDashboard.putNumber("heading", currentHeading)
 
         //Software-set max speed
-        SmartDashboard.putNumber("CurrentMaxSpeed", currentmaxspeed)
+        SmartDashboard.putNumber("CurrentMaxSpeed", currentMaxSpeed)
 
         //Encoder stuff
         SmartDashboard.putNumber("right_encoder_count", backRight.selectedSensorPosition.toDouble())

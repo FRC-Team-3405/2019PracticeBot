@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Spark
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.Robot
 import frc.robot.commands.RunFeederCommand
+import frc.robot.maps.MAX_FEEDER_MOTOR_SPEED
 import frc.robot.maps.MAX_MOTOR_SPEED
 import frc.robot.maps.RobotMap.FEEDER_MOTOR_PORT
 import frc.robot.maps.XboxMap
@@ -16,12 +17,18 @@ class Feeder: ReportableSubsystem() {
 
     private val feederMotor = Spark(FEEDER_MOTOR_PORT)
 //    private val secondaryFeederMotor = Spark(FEEDER_MOTOR_2_PORT)
+
     private var feederEnabled = false
+    private var currentMaxSpeed = MAX_FEEDER_MOTOR_SPEED
 
     fun runFeeder() {
-        if(feederEnabled) {
-            feederMotor.set(MAX_MOTOR_SPEED * 0.4)
-//            secondaryFeederMotor.set(-MAX_MOTOR_SPEED * 0.4)
+        currentMaxSpeed = SmartDashboard.getNumber("MaxFeederMotorSpeed", MAX_FEEDER_MOTOR_SPEED)
+        if(feederEnabled && Robot.joystick.RightLowerBumperButton.get()) {
+            feederMotor.set(-currentMaxSpeed)
+//            secondaryFeederMotor.set(-currentMaxSpeed)
+        } else if(feederEnabled) {
+            feederMotor.set(currentMaxSpeed)
+//            secondaryFeederMotor.set(currentMaxSpeed)
         } else {
             feederMotor.set(0.0)
 //            secondaryFeederMotor.set(0.0)
@@ -39,6 +46,7 @@ class Feeder: ReportableSubsystem() {
 //        SmartDashboard.putBoolean("feedermotor_isalive", feederMotor.isAlive)
 //        SmartDashboard.putBoolean("feedermotor_safetyenabled", feederMotor.isSafetyEnabled)
         SmartDashboard.putBoolean("Feeder Enabled", feederEnabled)
+        SmartDashboard.putNumber("MaxFeederMotorSpeed", currentMaxSpeed)
     }
 
 }

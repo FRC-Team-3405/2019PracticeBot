@@ -6,6 +6,11 @@ package frc.robot.maps
 const val MAX_MOTOR_SPEED = 0.85
 
 /**
+ * Maximum feeder motor speed
+ */
+const val MAX_FEEDER_MOTOR_SPEED = 0.4
+
+/**
  * Maximum Robot velocity when following paths (m/s)
  */
 const val MAX_ROBOT_VELOCITY = 1.5
@@ -63,10 +68,12 @@ const val TURN_TRAVEL_UNITS_PER_ROTATION = 3600.0
  */
 const val ENCODER_UNITS_PER_ROTATION = 9500 //Demo was 51711 WAS 10960 THEN 9500
 
+//TODO adjust this constant
 /**
  * Encoder units per one shaft rotation
  */
 const val ENCODER_UNITS_PER_REVOLUTION = 1440.0
+
 /** 1ms per loop.  PID loop can be slowed down if need be.
  * For example,
  * - if sensor updates are too slow

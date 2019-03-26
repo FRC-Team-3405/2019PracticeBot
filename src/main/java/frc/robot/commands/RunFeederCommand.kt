@@ -13,5 +13,12 @@ class RunFeederCommand: Command() {
         Robot.feeder.runFeeder()
     }
 
+    override fun interrupted() {
+        super.interrupted()
+        println("My feeder hath been interrupted...")
+    }
+
+    override fun isInterruptible() = true
+
     override fun isFinished() = false
 }

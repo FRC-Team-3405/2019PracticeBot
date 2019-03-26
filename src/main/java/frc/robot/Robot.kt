@@ -10,15 +10,18 @@ package frc.robot
 import edu.wpi.first.wpilibj.Joystick
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.command.Scheduler
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.commands.FollowPathCommand
 import frc.robot.commands.buttons.*
 import frc.robot.maps.JoystickMap
 import frc.robot.maps.RobotMap
+import frc.robot.maps.RobotMap.LEFT_LIGHT_SENSOR_PORT
+import frc.robot.maps.RobotMap.RIGHT_LIGHT_SENSOR_PORT
 import frc.robot.maps.XboxMap
 import frc.robot.subsystems.*
+import frc.robot.utilties.LightSensor
 import frc.robot.utilties.onPressed
+import frc.robot.utilties.whileHeld
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -44,7 +47,10 @@ class Robot : TimedRobot() {
         joystick.NineButton.onPressed(GrabHatchPanelCommand())
         joystick.TenButton.onPressed(ReleaseHatchPanelCommand())
         joystick.AButton.onPressed(SwitchDirectionCommand())
-        joystick.BButton.onPressed { Robot.feeder.toggleFeeder() } //TODO make command
+        joystick.BButton.onPressed(ToggleFeederCommand())
+        //RESERVED: Reverse feeder motors/belt: joystick.RightLowerBumperButton
+        //RESERVED: Brake on line follower detect line: joystick.LeftLowerBumperButton
+        //RESERVED: POV for specialized drive commands
 
         joystick.XButton.onPressed {
             val path = SmartDashboard.getString("path", "")
@@ -59,6 +65,12 @@ class Robot : TimedRobot() {
                 SmartDashboard.putString("current_path", null)
             }
         }
+
+        joystick.YButton.whileHeld {
+            //TODO point at camera target
+        }
+
+        secondaryJoystick.triggerButton.onPressed(ReleaseHatchPanelCommand())
     }
 
     /**
@@ -73,7 +85,7 @@ class Robot : TimedRobot() {
      * This function is called at the beginning of the sandstorm period.
      */
     override fun autonomousInit() {
-
+        println("Sandstorm has begun")
     }
 
     /**
@@ -87,7 +99,7 @@ class Robot : TimedRobot() {
      * This function is called at the end of the sandstorm period.
      */
     override fun teleopInit() {
-
+        println("Tele-Op has begun")
     }
 
     /**
@@ -101,7 +113,7 @@ class Robot : TimedRobot() {
      * This function is run when test is first started.
      */
     override fun testInit() {
-
+        println("Test initialized")
     }
 
     /**
@@ -115,7 +127,7 @@ class Robot : TimedRobot() {
      * This function is run when robot is first disabled.
      */
     override fun disabledInit() {
-
+        println("Robot disabled")
     }
 
     /**
@@ -152,8 +164,8 @@ class Robot : TimedRobot() {
         //Feeder subsystems
         val feeder = Feeder()
 
-        //Autonomous Control Subsystem
-//        val autonomousControl = AutonomousControl()
+        val leftLightSensor = LightSensor(LEFT_LIGHT_SENSOR_PORT)
+        val rightLightSensor = LightSensor(RIGHT_LIGHT_SENSOR_PORT)
 
         //Power
 //        val pdp = PowerDistributionPanel(0)

@@ -15,6 +15,16 @@ fun JoystickButton.onPressed(codeToExecute: () -> Unit) {
     })
 }
 
+fun JoystickButton.whileHeld(codeToExecute: () -> Unit) {
+    this.whileHeld(object: Command() {
+        override fun execute() {
+            codeToExecute()
+        }
+
+        override fun isFinished() = true
+    })
+}
+
 fun JoystickButton.onPressed(command: Command) {
     this.whenPressed(command)
 }

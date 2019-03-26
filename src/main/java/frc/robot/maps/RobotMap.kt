@@ -11,6 +11,8 @@ object RobotMap {
 
     //Sensors
     const val GYROSCOPE_PORT = 0
+    const val LEFT_LIGHT_SENSOR_PORT = 0
+    const val RIGHT_LIGHT_SENSOR_PORT = 1
 
     //Cameras
 
