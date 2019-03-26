@@ -28,8 +28,10 @@ class DriveTrain : ReportableSubsystem() {
 
 
     private var rotating = false // Used for turning to an angle
+    private var drivingDistance = false //Used for driving to a specific distance
     private var currentHeading = 0.0 // Used for driving straight
     private var targetAngle = 0.0 // Used for turning to an angle
+    private var targetDistance = 0.0 //Used for driving to a specific distance
 
     private var povPressed = false
 
@@ -103,21 +105,31 @@ class DriveTrain : ReportableSubsystem() {
     fun drive() {
         currentMaxSpeed = SmartDashboard.getNumber("CurrentMaxSpeed", MAX_MOTOR_SPEED)
 
-        if (rotating) {
-            //TODO check this rotation code
-            when {
-                targetAngle > Robot.gyroscope.getAngle() - Robot.gyroscope.getRate() -> {
-                    //Rotate right at full speed
-                    driveSide(currentMaxSpeed, -currentMaxSpeed)
-                }
-                targetAngle < Robot.gyroscope.getAngle() + Robot.gyroscope.getRate() -> {
-                    //Rotate left at full speed
-                    driveSide(-currentMaxSpeed, currentMaxSpeed)
-                }
-                else -> {
+        if(rotating) {
+            if(targetAngle > 0) {
+                SmartDashboard.putNumber("ROTATION", calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()))
+                if(calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()) + calculateRotation(Math.abs(backLeft.selectedSensorVelocity - backRight.selectedSensorVelocity).toDouble()) > targetAngle) {
                     rotating = false
-                    println("Rotated to ${Robot.gyroscope.getAngle()}")
+                } else {
+                    driveSide(-currentMaxSpeed * 0.75, currentMaxSpeed * 0.75, Direction.HATCH_FORWARD)
+                    return
                 }
+            } else {
+                SmartDashboard.putNumber("ROTATION", calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()))
+                if(calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()) + calculateRotation(Math.abs(backLeft.selectedSensorVelocity - backRight.selectedSensorVelocity).toDouble()) < targetAngle) {
+                    rotating = false
+                } else {
+                    driveSide(currentMaxSpeed * 0.75, -currentMaxSpeed * 0.75, Direction.HATCH_FORWARD)
+                    return
+                }
+            }
+        }
+        else if(drivingDistance) {
+            if(calculateDistance(Math.abs(backRight.selectedSensorPosition).toDouble()) + 1.5 * calculateDistance(Math.abs(backRight.selectedSensorVelocity).toDouble()) > targetDistance) {
+                drivingDistance = false
+            } else {
+                driveStraight(currentMaxSpeed)
+                return
             }
         } else if (Robot.joystick.povController != XboxMap.PovDirections.NULL) {
             //The POV pad on the joystick controls specialized driving maneuvers.
@@ -139,12 +151,12 @@ class DriveTrain : ReportableSubsystem() {
                 }
                 XboxMap.PovDirections.RIGHT -> {
                     if (!povPressed) {
-                        autoTurnAngle(Robot.gyroscope.getAngle() + 180)
+                        turnAngle(180.0)
                     }
                 }
                 XboxMap.PovDirections.LEFT -> {
                     if (!povPressed) {
-                        autoTurnAngle(Robot.gyroscope.getAngle() - 180)
+                        turnAngle(-180.0)
                     }
                 }
                 XboxMap.PovDirections.NULL -> {}
@@ -182,9 +194,9 @@ class DriveTrain : ReportableSubsystem() {
         }
     }
 
-    fun driveSide(powerLeft: Double, powerRight: Double) {
-        backLeft.set(ControlMode.PercentOutput, powerLeft * direction.sign)
-        backRight.set(ControlMode.PercentOutput, powerRight * direction.sign)
+    fun driveSide(powerLeft: Double, powerRight: Double, pathDirection: Direction = this.direction) {
+        backLeft.set(ControlMode.PercentOutput, powerLeft * pathDirection.sign)
+        backRight.set(ControlMode.PercentOutput, powerRight * pathDirection.sign)
         frontLeft.follow(backLeft)
         frontRight.follow(backRight)
     }
@@ -197,11 +209,6 @@ class DriveTrain : ReportableSubsystem() {
     private fun driveStraight(power: Double) {
         backRight.set(ControlMode.PercentOutput, power * direction.sign, DemandType.AuxPID, currentHeading)
         backLeft.follow(backRight, FollowerType.AuxOutput1)
-    }
-
-    private fun autoTurnAngle(degrees: Double) {
-        targetAngle = degrees
-        rotating = true
     }
 
     private fun calcRotation(encoderDiff: Double): Double {
@@ -225,10 +232,32 @@ class DriveTrain : ReportableSubsystem() {
         backRight.sensorCollection.setQuadraturePosition(0, TIMEOUT_MS)
     }
 
+    fun turnAngle(degrees: Double) {
+        resetEncoderCounts()
+        targetAngle = degrees
+        rotating = true
+    }
+
+    private fun calculateRotation(encoderDiff: Double): Double {
+        return (encoderDiff / ENCODER_UNITS_PER_ROTATION) * 360.0
+    }
+
+    private fun calculateDistance(encoderUnits: Double): Double {
+        return (encoderUnits / 1440.0) * 6 * PI
+    }
+
+    fun driveDistance(inches: Double) {
+        resetEncoderCounts()
+        targetDistance = inches
+        drivingDistance = true
+    }
+
     override fun report() {
         //Robot direction
         SmartDashboard.putNumber("direction", direction.sign.toDouble())
         SmartDashboard.putNumber("heading", currentHeading)
+
+        SmartDashboard.putNumber("Target angle", targetAngle)
 
         //Software-set max speed
         SmartDashboard.putNumber("CurrentMaxSpeed", currentMaxSpeed)

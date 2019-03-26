@@ -66,13 +66,18 @@ const val TURN_TRAVEL_UNITS_PER_ROTATION = 3600.0
  * Drive the robot in counter clockwise rotations and measure the units per rotation.
  * Take the average of the two.
  */
-const val ENCODER_UNITS_PER_ROTATION = 9500 //Demo was 51711 WAS 10960 THEN 9500
+const val ENCODER_UNITS_PER_ROTATION = 51711 //Demo was 51711 WAS 10960 THEN 9500
 
 //TODO adjust this constant
 /**
  * Encoder units per one shaft rotation
  */
-const val ENCODER_UNITS_PER_REVOLUTION = 1440.0
+const val ENCODER_UNITS_PER_REVOLUTION = 4096.0
+
+/**
+ * When turning to a specific angle, the deadzone where no more corrections will be made.
+ */
+const val ANGLE_DEADZONE = 5.0
 
 /** 1ms per loop.  PID loop can be slowed down if need be.
  * For example,

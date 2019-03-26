@@ -6,6 +6,7 @@ import frc.robot.Robot
 import frc.robot.maps.ENCODER_UNITS_PER_REVOLUTION
 import frc.robot.maps.MAX_ROBOT_VELOCITY
 import frc.robot.maps.WHEEL_DIAMETER
+import frc.robot.subsystems.Direction
 import jaci.pathfinder.Pathfinder
 import jaci.pathfinder.PathfinderFRC
 import jaci.pathfinder.followers.EncoderFollower
@@ -74,7 +75,7 @@ class FollowPathCommand(val pathName: String): Command() {
                 println("Heading difference: $headingDifference")
                 val turn = 0.8 * (-1.0 / 80.0) * headingDifference
                 println("Turning: $turn")
-                Robot.driveTrain.driveSide((leftSpeed + turn), (rightSpeed - turn))
+                Robot.driveTrain.driveSide((leftSpeed + turn), (rightSpeed - turn), Direction.HATCH_FORWARD)
             }
         } catch (e: Exception) {
             Robot.driveTrain.driveSide(0.0, 0.0)
