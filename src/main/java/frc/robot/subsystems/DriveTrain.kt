@@ -111,14 +111,6 @@ class DriveTrain : ReportableSubsystem() {
                 if(calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()) + calculateRotation(Math.abs(backLeft.selectedSensorVelocity - backRight.selectedSensorVelocity).toDouble()) > targetAngle) {
                     rotating = false
                 } else {
-                    driveSide(-currentMaxSpeed * 0.75, currentMaxSpeed * 0.75, Direction.HATCH_FORWARD)
-                    return
-                }
-            } else {
-                SmartDashboard.putNumber("ROTATION", calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()))
-                if(calculateRotation(Math.abs(backLeft.selectedSensorPosition - backRight.selectedSensorPosition).toDouble()) + calculateRotation(Math.abs(backLeft.selectedSensorVelocity - backRight.selectedSensorVelocity).toDouble()) < targetAngle) {
-                    rotating = false
-                } else {
                     driveSide(currentMaxSpeed * 0.75, -currentMaxSpeed * 0.75, Direction.HATCH_FORWARD)
                     return
                 }
@@ -149,14 +141,9 @@ class DriveTrain : ReportableSubsystem() {
 
                     driveStraight(-currentMaxSpeed * 0.85) //TODO tune
                 }
-                XboxMap.PovDirections.RIGHT -> {
+                XboxMap.PovDirections.RIGHT, XboxMap.PovDirections.LEFT -> {
                     if (!povPressed) {
                         turnAngle(180.0)
-                    }
-                }
-                XboxMap.PovDirections.LEFT -> {
-                    if (!povPressed) {
-                        turnAngle(-180.0)
                     }
                 }
                 XboxMap.PovDirections.NULL -> {}

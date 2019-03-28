@@ -66,7 +66,7 @@ const val TURN_TRAVEL_UNITS_PER_ROTATION = 3600.0
  * Drive the robot in counter clockwise rotations and measure the units per rotation.
  * Take the average of the two.
  */
-const val ENCODER_UNITS_PER_ROTATION = 51711 //Demo was 51711 WAS 10960 THEN 9500
+const val ENCODER_UNITS_PER_ROTATION = 55000 //Demo was 51711 WAS 10960 THEN 9500
 
 //TODO adjust this constant
 /**

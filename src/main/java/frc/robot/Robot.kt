@@ -53,7 +53,8 @@ class Robot : TimedRobot() {
         //RESERVED: POV for specialized drive commands
 
         joystick.XButton.onPressed {
-            val path = SmartDashboard.getString("path", "")
+//            val path = SmartDashboard.getString("path", "")
+            val path = "G-R"
             if (path.isNotEmpty() && currentPathCommand?.isRunning != true) {
                 currentPathCommand = FollowPathCommand(path)
                 currentPathCommand?.start()
